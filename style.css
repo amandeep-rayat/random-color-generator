@@ -86,22 +86,40 @@ th,
 td {
     border: 1px solid black;
     border-collapse: collapse;
+    text-align: center;
+    min-width: 150px;
+    min-height: 400px;
 }
 
-.color-preview {
+/* .color-preview {
     height: 25px;
     width: 25px;
-}
+} */
 
 .color-preview:hover {
     cursor: pointer;
     height: 50px;
-    width: 50px;
 }
 
 #searchInput {
     width: 200px;
     border: #000 1px solid;
-    border-radius: 8px;
+    border-radius: 4px;
     font: 1.2rem sans-serif;
+    margin-right: 20px;
+}
+
+#searchInput:focus {
+    outline: none;
+}
+
+.table-opt {
+    font: 1em sans-serif;
+    position: relative;
+    left: 50%;
+    height: 25px;
+    width: 25px;
+    background-color: coral;
+    border: 0;
+    margin: 5px;
 }

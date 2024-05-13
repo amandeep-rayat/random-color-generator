@@ -13,9 +13,12 @@ colorcontainer.id = "colorcontainer";
 const ops = document.createElement("div");
 const container = document.createElement("div");
 const colorTableBody = document.createElement("table");
+colorTableBody.createCaption();
+colorTableBody.caption.textContent = "W3C Named Colors";
 const table = document.createElement("div");
 table.id = "table";
 const entries = document.createElement("span");
+entries.style.margin = "10px";
 const copy = document.createElement("button");
 const form = document.createElement("button");
 copy.id = "copy";
@@ -25,11 +28,14 @@ const next = document.createElement("button");
 const search = document.createElement("input");
 const change = document.createElement("button");
 search.id = "searchInput";
+search.placeholder = "Search for a color";
 change.innerHTML = "Click Here";
 change.classList.add("opt");
 prev.innerHTML = "<=";
 next.innerHTML = "=>";
-icon = { 'size': '30', 'fill': 'white', 'stroke': 'white', 'strokeWidth': '2'};
+prev.classList.add("table-opt");
+next.classList.add("table-opt");
+icon = { 'size': '30', 'fill': 'white', 'stroke': 'white', 'strokeWidth': '2' };
 copy.innerHTML = `<svg class="btn" id="copy" width="${icon.size}" height="${icon.size}" viewBox="0 0 ${icon.size} ${icon.size}" 
 xmlns="http://www.w3.org/2000/svg" stroke="${icon.stroke}" stroke-width="${icon.strokeWidth}">
 <line x1="8" y1="8" x2="8" y2="22" />
@@ -45,16 +51,14 @@ stroke="${icon.stroke}" fill="${icon.fill}" stroke-width="${icon.strokeWidth}">
 <circle cx="15" cy="15" r="10" fill="none"/>
 <path d="M 15 5 a 2 2 1 1 1 0 20 Z" />
 </svg>`;
-let sel = 0;
-let tabledata = `
-<caption>W3C Named Colors</caption>
-<thead>
-    <th>S. no.</th>
-    <th style="width:215px">Color Name</th>
-    <th>Hex Code</th>
-    <th>Preview</th>
-</thead>
-`;
+let sel = 0, entriesLength = 10;
+colorTableBody.createTHead().insertRow();
+colorTableBody.tHead.rows[0].insertCell().textContent = "S. no.";
+colorTableBody.tHead.rows[0].insertCell().textContent = "Color Name";
+colorTableBody.tHead.rows[0].insertCell().textContent = "Hex Code";
+colorTableBody.tHead.rows[0].insertCell().textContent = "Preview";
+colorTableBody.tHead.rows[0].style['backgroundColor'] = 'black';
+colorTableBody.tHead.rows[0].style['color'] = 'white';
 color.style['font-size'] = '20px';
 container.classList.add("container");
 container.style['backgroundColor'] = 'black';
@@ -72,6 +76,7 @@ function getRandomColor() {
     for (let i = 0; i < 6; i++) {
         hexColor += hex[getRandomNumber()];
     }
+    console.log(hexColor);
     return hexColor;
 }
 
@@ -86,7 +91,7 @@ function changeColor() {
 window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         changeColor();
-        // change.removeEventListener('click', changeColor);
+        e.preventDefault();
         console.log("Space Pressed");
     }
 });
@@ -102,13 +107,12 @@ copy.addEventListener('click', () => {
     el.value = colorVal.substring(18, colorVal.length);
     document.body.appendChild(el);
     el.select();
-    document.execCommand('copy');
+    document.execCommand('copy', true);
     document.body.removeChild(el);
     alert("Copied to clipboard");
 });
 
 form.addEventListener('click', () => {
-    // let colorVal = color.textContent.substring();
     const { r, g, b } = hexToRgb(hexColor);
     const { h, s, l } = rgbToHsl(r, g, b);
     sel = (sel + 1) % 3;
@@ -160,7 +164,6 @@ function rgbToHsl(r, g, b) {
     l = Math.round(l * 100);
     return { h, s, l };
 }
-
 
 const w3cNamedColors = {
     "aliceblue": "#F0F8FF",
@@ -314,13 +317,14 @@ const w3cNamedColors = {
 };
 
 const colors = Object.keys(w3cNamedColors);
-
 function generateTableRows(s, e, tab) {
-    colorTableBody.innerHTML = tabledata;
+    if (colorTableBody.tBodies.length > 0)
+        colorTableBody.removeChild(colorTableBody.tBodies[0]);
+    colorTableBody.createTBody();
     for (let i = s; i < e; i++) {
         const colorName = colors[tab[i]];
         const hexCode = w3cNamedColors[colorName];
-        const row = colorTableBody.insertRow();
+        const row = colorTableBody.tBodies[0].insertRow();
         row.insertCell().textContent = i + 1;
         row.insertCell().textContent = colorName;
         row.insertCell().textContent = hexCode;
@@ -330,11 +334,9 @@ function generateTableRows(s, e, tab) {
     }
     entries.textContent = `Showing ${s + 1} to ${e} of ${tab.length} entries`;
 }
-let i = 0, j = 10;
-let tabl = [];
-for (let k = 0; k < colors.length; k++) {
-    tabl.push(k);
-}
+
+let i = 0, j = entriesLength, o = colors.length;
+let tabl = colors.map((_, i) => i);
 
 btns[0].addEventListener('click', () => {
     generateTableRows(i, j, tabl);
@@ -342,11 +344,10 @@ btns[0].addEventListener('click', () => {
     btns[1].classList.remove('y');
     container.style['backgroundColor'] = 'white';
     table.appendChild(search);
-    table.appendChild(entries);
     table.appendChild(prev);
     table.appendChild(next);
-    // table.appendChild(table);
     table.appendChild(colorTableBody);
+    table.appendChild(entries);
     container.replaceChildren(table);
 });
 
@@ -366,40 +367,30 @@ btns[1].addEventListener('click', () => {
 });
 
 prev.addEventListener('click', () => {
-    if (i == 0) {
-        return;
-    }
-    i = Math.max(0, i - 10);
-    if (j == colors.length - 1) j -= (colors.length - 1) % 10;
-    else j = Math.min(colors.length - 1, j - 10 - j % 10);
-    colorTableBody.innerHTML = '';
+    if (i == 0) return;
+    i = Math.max(0, i - entriesLength);
+    if (j == tabl.length && tabl.length%entriesLength != 0) j -= (tabl.length) % entriesLength;
+    else j = Math.min(tabl.length, j - entriesLength - j % entriesLength);
+    console.log(i, j);
     generateTableRows(i, j, tabl);
 });
+
 next.addEventListener('click', () => {
-    if (j == colors.length - 1) {
-        return;
-    }
-    i = Math.min(colors.length - 1, i + 10);
-    j = Math.min(colors.length - 1, j + 10);
-    colorTableBody.innerHTML = '';
+    if (j == tabl.length) return;
+    i = Math.min(tabl.length, i + entriesLength);
+    j = Math.min(tabl.length, j + entriesLength);
+    console.log(i, j);
     generateTableRows(i, j, tabl);
 });
+
 search.addEventListener('keyup', () => {
     let s = search.value;
-    
-        let temp = [];
-        for (let k = 0; k < colors.length; k++) {
-            if (colors[k].toLowerCase().includes(s.toLowerCase()) || w3cNamedColors[colors[k]].toLowerCase().includes(s.toLowerCase())) {
-                temp.push(k);
-            }
-        }
-        if (temp.length == 0) {
-            colorTableBody.innerHTML = '';
-        }
-        else {
-            i = 0;
-            j = Math.min(temp.length, 10);
-            colorTableBody.innerHTML = '';
-            generateTableRows(i, j, temp);
-        }
+    tabl = [];
+    for (let k = 0; k < colors.length; k++) {
+        if (colors[k].toLowerCase().includes(s.toLowerCase()) || w3cNamedColors[colors[k]].toLowerCase().includes(s.toLowerCase()))
+            tabl.push(k);
+    }
+    i = 0;
+    j = Math.min(tabl.length, entriesLength);
+    generateTableRows(i, j, tabl);
 });
