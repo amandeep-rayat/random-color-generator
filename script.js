@@ -4,7 +4,6 @@ const color = document.createElement("div");
 const main = document.querySelector("main");
 const text = document.createElement("h2");
 text.innerHTML = "Press Space to generate a random color";
-const heading = document.createElement("h2");
 const btns = document.querySelectorAll(".opt");
 const colorcontainer = document.createElement("div");
 const colorops = document.createElement("div");
@@ -92,13 +91,11 @@ window.addEventListener('keydown', (e) => {
     if (e.code === 'Space') {
         changeColor();
         e.preventDefault();
-        console.log("Space Pressed");
     }
 });
 
 change.addEventListener('click', () => {
     changeColor();
-    console.log("Button Clicked");
 });
 
 copy.addEventListener('click', () => {
@@ -371,7 +368,6 @@ prev.addEventListener('click', () => {
     i = Math.max(0, i - entriesLength);
     if (j == tabl.length && tabl.length%entriesLength != 0) j -= (tabl.length) % entriesLength;
     else j = Math.min(tabl.length, j - entriesLength - j % entriesLength);
-    console.log(i, j);
     generateTableRows(i, j, tabl);
 });
 
@@ -379,7 +375,6 @@ next.addEventListener('click', () => {
     if (j == tabl.length) return;
     i = Math.min(tabl.length, i + entriesLength);
     j = Math.min(tabl.length, j + entriesLength);
-    console.log(i, j);
     generateTableRows(i, j, tabl);
 });
 

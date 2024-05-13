@@ -91,11 +91,6 @@ td {
     min-height: 400px;
 }
 
-/* .color-preview {
-    height: 25px;
-    width: 25px;
-} */
-
 .color-preview:hover {
     cursor: pointer;
     height: 50px;
